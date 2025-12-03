@@ -14,7 +14,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/MYAPP"
+        DEPLOY_DIR = "/var/jenkins_home/deploy"
     }
 
     stages {
@@ -43,8 +43,8 @@ pipeline {
                     echo "Deploying to: ${targetDir}"
 
                     sh """
-                    sudo mkdir -p ${targetDir}
-                    sudo cp -r * ${targetDir}/
+                    mkdir -p ${targetDir}
+                    cp -r * ${targetDir}/
                     """
                 }
             }
