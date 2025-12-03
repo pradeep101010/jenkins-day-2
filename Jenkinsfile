@@ -1,6 +1,8 @@
 pipeline {
     agent { label 'docker-agent' }
-
+    options {
+    skipDefaultCheckout()
+}
     parameters {
         string(
             name: 'ENVIRONMENT',
@@ -10,7 +12,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"    // Change if needed
+        DEPLOY_DIR = "/var/www/myapp"    
     }
 
     stages {
