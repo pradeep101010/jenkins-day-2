@@ -1,8 +1,9 @@
 pipeline {
     agent { label 'docker-agent' }
     options {
-    skipDefaultCheckout()
-}
+        skipDefaultCheckout()
+    }
+
     parameters {
         string(
             name: 'ENVIRONMENT',
@@ -12,7 +13,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"    
+        DEPLOY_DIR = "/var/www/myapp"
     }
 
     stages {
@@ -23,16 +24,22 @@ pipeline {
             }
         }
 
-      stage('Checkout') {
-    steps {
-        checkout([
-            $class: 'GitSCM',
-            branches: [[name: 'refs/heads/main']],
-            userRemoteConfigs: [[url: 'https://github.com/heroku/node-js-sample.git']]
-        ])
-    }
-}
-
+        stage('Checkout') {
+            steps {
+                // Clean workspace to avoid branch conflicts
+                deleteDir()
+                
+                // Explicitly checkout Heroku main
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'refs/heads/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/heroku/node-js-sample.git',
+                        refspec: '+refs/heads/main:refs/remotes/origin/main'
+                    ]]
+                ])
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
