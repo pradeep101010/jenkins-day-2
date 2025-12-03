@@ -45,12 +45,16 @@ pipeline {
         stage('Run Tests (Skip If None)') {
             steps {
                 script {
-                    def packageJson = readJSON file: 'package.json'
-                    if (packageJson.scripts?.test) {
+                    def hasTestScript = sh(
+                        script: "jq -r '.scripts.test // \"\"' package.json | grep -v '^null$'",
+                        returnStatus: true
+                    ) == 0
+
+                    if (hasTestScript) {
                         echo "Running tests..."
                         sh 'npm test'
                     } else {
-                        echo "No test script found — skipping tests."
+                        echo "No test script in package.json — skipping tests."
                     }
                 }
             }
@@ -59,12 +63,16 @@ pipeline {
         stage('Build App (Skip If None)') {
             steps {
                 script {
-                    def packageJson = readJSON file: 'package.json'
-                    if (packageJson.scripts?.build) {
+                    def hasBuildScript = sh(
+                        script: "jq -r '.scripts.build // \"\"' package.json | grep -v '^null$'",
+                        returnStatus: true
+                    ) == 0
+
+                    if (hasBuildScript) {
                         echo "Running build..."
                         sh 'npm run build'
                     } else {
-                        echo "No build script found — skipping build."
+                        echo "No build script — creating dummy build directory"
                         sh "mkdir -p build && cp -r * build/ || true"
                     }
                 }
@@ -75,14 +83,14 @@ pipeline {
             steps {
                 script {
                     def targetDir = "${DEPLOY_DIR}/${params.ENVIRONMENT}"
-                    echo "Deploying to: ${targetDir}"
-
                     sh """
                         mkdir -p ${targetDir}
                         cp -r build/* ${targetDir}/
                     """
+                    echo "Deployment completed to: ${targetDir}"
                 }
             }
         }
+
     }
 }
