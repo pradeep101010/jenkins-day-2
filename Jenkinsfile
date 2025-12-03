@@ -14,7 +14,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"
+        DEPLOY_DIR = "/MYAPP"
     }
 
     stages {
