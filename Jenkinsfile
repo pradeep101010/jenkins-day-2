@@ -33,7 +33,7 @@ pipeline {
 
                     // Clone main branch explicitly
                     sh '''
-                        git clone --branch main --single-branch https://github.com/heroku/node-js-sample.git .
+                        git clone --branch master --single-branch https://github.com/heroku/node-js-sample.git .
                     '''
                 }
             }
