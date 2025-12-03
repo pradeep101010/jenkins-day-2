@@ -21,13 +21,11 @@ pipeline {
             }
         }
 
-        // stage('Checkout') {
-        //     steps {
-        //         git branch: 'main', url: 'https://github.com/heroku/node-js-sample.git'
-'
-        //     }
-        // }
-
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/heroku/node-js-sample.git'
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
