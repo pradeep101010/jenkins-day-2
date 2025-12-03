@@ -14,7 +14,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"    
+        DEPLOY_DIR = "/var/www/myapp"
     }
 
     stages {
@@ -25,15 +25,21 @@ pipeline {
             }
         }
 
-        stage('Checkout Main Branch') {
+        stage('Always Checkout Heroku Master') {
             steps {
                 script {
+
                     // Clean workspace
                     deleteDir()
 
-                    // Clone main branch explicitly
+                    // Always clone Heroku master regardless of current branch
                     sh '''
-                        git clone --branch master --single-branch https://github.com/heroku/node-js-sample.git .
+                        echo "Cloning Heroku master branch..."
+                        git clone \
+                            --branch master \
+                            --single-branch \
+                            https://git.heroku.com/<your-heroku-app>.git \
+                            .
                     '''
                 }
             }
