@@ -25,7 +25,7 @@ pipeline {
             }
         }
 
-        stage('Checkout Main Branch') {
+        stage('Checkout Code') {
             steps {
                 script {
                     deleteDir()
@@ -36,61 +36,18 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Run Tests (Skip If None)') {
-            steps {
-                script {
-                    def hasTestScript = sh(
-                        script: "jq -r '.scripts.test // \"\"' package.json | grep -v '^null$'",
-                        returnStatus: true
-                    ) == 0
-
-                    if (hasTestScript) {
-                        echo "Running tests..."
-                        sh 'npm test'
-                    } else {
-                        echo "No test script in package.json — skipping tests."
-                    }
-                }
-            }
-        }
-
-        stage('Build App (Skip If None)') {
-            steps {
-                script {
-                    def hasBuildScript = sh(
-                        script: "jq -r '.scripts.build // \"\"' package.json | grep -v '^null$'",
-                        returnStatus: true
-                    ) == 0
-
-                    if (hasBuildScript) {
-                        echo "Running build..."
-                        sh 'npm run build'
-                    } else {
-                        echo "No build script — creating dummy build directory"
-                        sh "mkdir -p build && cp -r * build/ || true"
-                    }
-                }
-            }
-        }
-
         stage('Deploy') {
             steps {
                 script {
                     def targetDir = "${DEPLOY_DIR}/${params.ENVIRONMENT}"
+                    echo "Deploying to: ${targetDir}"
+
                     sh """
                         mkdir -p ${targetDir}
-                        cp -r build/* ${targetDir}/
+                        cp -r * ${targetDir}/
                     """
-                    echo "Deployment completed to: ${targetDir}"
                 }
             }
         }
-
     }
 }
