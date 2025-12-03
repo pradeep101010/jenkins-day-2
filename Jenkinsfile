@@ -38,7 +38,7 @@ pipeline {
                         git clone \
                             --branch master \
                             --single-branch \
-                            https://git.heroku.com/<your-heroku-app>.git \
+                            https://github.com/heroku/node-js-sample.git \
                             .
                     '''
                 }
