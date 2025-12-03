@@ -23,11 +23,12 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/heroku/node-js-sample.git'
-            }
-        }
+        checkout([
+    $class: 'GitSCM',
+    branches: [[name: 'refs/heads/main']],
+    userRemoteConfigs: [[url: 'https://github.com/heroku/node-js-sample.git']]
+])
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
