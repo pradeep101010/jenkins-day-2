@@ -1,7 +1,8 @@
 pipeline {
     agent { label 'docker-agent' }
+    
     options {
-        skipDefaultCheckout()
+        skipDefaultCheckout()  // skip automatic branch checkout
     }
 
     parameters {
@@ -13,7 +14,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"
+        DEPLOY_DIR = "/var/www/myapp"    
     }
 
     stages {
@@ -24,20 +25,23 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
+        stage('Checkout Main Branch') {
             steps {
-                // Clean workspace to avoid branch conflicts
-                deleteDir()
-                
-                // Explicitly checkout Heroku main
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: 'refs/heads/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/heroku/node-js-sample.git',
-                        refspec: '+refs/heads/main:refs/remotes/origin/main'
-                    ]]
-                ])
+                script {
+                    // Completely clean workspace before checkout
+                    deleteDir()
+
+                    // Checkout main branch explicitly
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'refs/heads/main']],
+                        doGenerateSubmoduleConfigurations: false,
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/heroku/node-js-sample.git',
+                            refspec: '+refs/heads/main:refs/remotes/origin/main'
+                        ]]
+                    ])
+                }
             }
         }
 
@@ -63,7 +67,6 @@ pipeline {
             steps {
                 script {
                     def targetDir = "${DEPLOY_DIR}/${params.ENVIRONMENT}"
-
                     echo "Deploying to: ${targetDir}"
 
                     sh """
