@@ -43,8 +43,8 @@ pipeline {
                     echo "Deploying to: ${targetDir}"
 
                     sh """
-                        mkdir -p ${targetDir}
-                        cp -r * ${targetDir}/
+                    sudo mkdir -p ${targetDir}
+                    sudo cp -r * ${targetDir}/
                     """
                 }
             }
