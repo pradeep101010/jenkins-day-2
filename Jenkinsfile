@@ -17,7 +17,7 @@ pipeline {
 
         stage('Print Selected Environment') {
             steps {
-                echo "Running pipeline for environment: ${ENVIRONMENT}"
+                echo "Running pipeline for environment: ${params.ENVIRONMENT}"
             }
         }
 
@@ -48,23 +48,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "Deploying build artifacts to ${ENVIRONMENT}"
+                    def targetDir = "${DEPLOY_DIR}/${params.ENVIRONMENT}"
 
-                    if (ENVIRONMENT == "dev") {
-                        sh "mkdir -p ${DEPLOY_DIR}/dev"
-                        sh "cp -r build/* ${DEPLOY_DIR}/dev/"
-                    }
-                    else if (ENVIRONMENT == "test") {
-                        sh "mkdir -p ${DEPLOY_DIR}/test"
-                        sh "cp -r build/* ${DEPLOY_DIR}/test/"
-                    }
-                    else if (ENVIRONMENT == "prod") {
-                        sh "mkdir -p ${DEPLOY_DIR}/prod"
-                        sh "cp -r build/* ${DEPLOY_DIR}/prod/"
-                    }
-                    else {
-                        error "Invalid environment: ${ENVIRONMENT}"
-                    }
+                    echo "Deploying to: ${targetDir}"
+
+                    sh """
+                        mkdir -p ${targetDir}
+                        cp -r build/* ${targetDir}/
+                    """
                 }
             }
         }
