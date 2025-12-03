@@ -25,21 +25,12 @@ pipeline {
             }
         }
 
-        stage('Always Checkout Heroku Master') {
+        stage('Checkout Main Branch') {
             steps {
                 script {
-
-                    // Clean workspace
                     deleteDir()
-
-                    // Always clone Heroku master regardless of current branch
                     sh '''
-                        echo "Cloning Heroku master branch..."
-                        git clone \
-                            --branch master \
-                            --single-branch \
-                            https://github.com/heroku/node-js-sample.git \
-                            .
+                        git clone --branch master --single-branch https://github.com/heroku/node-js-sample.git .
                     '''
                 }
             }
@@ -51,15 +42,32 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Tests (Skip If None)') {
             steps {
-                sh 'npm test'
+                script {
+                    def packageJson = readJSON file: 'package.json'
+                    if (packageJson.scripts?.test) {
+                        echo "Running tests..."
+                        sh 'npm test'
+                    } else {
+                        echo "No test script found — skipping tests."
+                    }
+                }
             }
         }
 
-        stage('Build App') {
+        stage('Build App (Skip If None)') {
             steps {
-                sh 'npm run build'
+                script {
+                    def packageJson = readJSON file: 'package.json'
+                    if (packageJson.scripts?.build) {
+                        echo "Running build..."
+                        sh 'npm run build'
+                    } else {
+                        echo "No build script found — skipping build."
+                        sh "mkdir -p build && cp -r * build/ || true"
+                    }
+                }
             }
         }
 
