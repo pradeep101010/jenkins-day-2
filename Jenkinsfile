@@ -1,6 +1,8 @@
 pipeline {
     agent { label 'docker-agent' }
-
+    options {
+    skipDefaultCheckout()
+}
     parameters {
         string(
             name: 'ENVIRONMENT',
@@ -10,7 +12,7 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = "/var/www/myapp"    // Change if needed
+        DEPLOY_DIR = "/var/www/myapp"    
     }
 
     stages {
@@ -21,11 +23,12 @@ pipeline {
             }
         }
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/heroku/node-js-sample.git'
-            }
-        }
+        checkout([
+    $class: 'GitSCM',
+    branches: [[name: 'refs/heads/main']],
+    userRemoteConfigs: [[url: 'https://github.com/heroku/node-js-sample.git']]
+])
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
