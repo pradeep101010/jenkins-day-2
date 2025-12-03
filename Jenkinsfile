@@ -1,8 +1,8 @@
 pipeline {
     agent { label 'docker-agent' }
-    
+
     options {
-        skipDefaultCheckout()  // skip automatic branch checkout
+        skipDefaultCheckout()
     }
 
     parameters {
@@ -28,19 +28,13 @@ pipeline {
         stage('Checkout Main Branch') {
             steps {
                 script {
-                    // Completely clean workspace before checkout
+                    // Clean workspace
                     deleteDir()
 
-                    // Checkout main branch explicitly
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: 'refs/heads/main']],
-                        doGenerateSubmoduleConfigurations: false,
-                        userRemoteConfigs: [[
-                            url: 'https://github.com/heroku/node-js-sample.git',
-                            refspec: '+refs/heads/main:refs/remotes/origin/main'
-                        ]]
-                    ])
+                    // Clone main branch explicitly
+                    sh '''
+                        git clone --branch main --single-branch https://github.com/heroku/node-js-sample.git .
+                    '''
                 }
             }
         }
