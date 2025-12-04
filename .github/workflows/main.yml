@@ -1,13 +1,20 @@
 name: learn-github-actions
-on: self-hosted
+
+on:
+  push:
+    branches: [ "main" ]
+
 jobs:
   check-bats-version:
-    runs-on: 
-      group: ubuntu-runners
+    runs-on: self-hosted
+
     steps:
       - uses: actions/checkout@v5
+
       - uses: actions/setup-node@v4
         with:
           node-version: '14'
+
       - run: npm install -g bats
+
       - run: bats -v
